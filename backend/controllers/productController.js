@@ -1,4 +1,5 @@
 const Product = require("../model/productmodel");
+const Errorhandler = require("../utils/errorhandlers");
 
 
 // create product  admin
@@ -15,7 +16,7 @@ exports.createProduct = async (req, res, next) => {
 // get all product 
 
 exports.getAllProducts = async (req, res) => {
-  const products = await Product.find();
+    const products = await Product.find();
     // res.status(200).json({ message: "route is working fine" })
     res.status(201).json({
         success: true,
@@ -25,18 +26,26 @@ exports.getAllProducts = async (req, res) => {
 
 // get product details 
 
-exports.getProductdetails = async (req,res,next)=>{
+exports.getProductdetails = async (req, res, next) => {
     const product = await Product.findById(req.params.id);
 
-    if(!product){
-        return res.status(500).json({
-            success:false,
-            message:"Product not found"
-        })
+    if (!product) {
+
+
+        return next(new Errorhandler("Product not found", 404));
+
+
+        // ##### this line of code was working but i cmmt thuis because now i use error handler ####
+
+
+        // return res.status(500).json({
+        //     success: false,
+        //     message: "Product not found"
+        // })
     }
 
-     res.status(200).json({
-        success:true,
+    res.status(200).json({
+        success: true,
         product
     })
 }
@@ -44,48 +53,51 @@ exports.getProductdetails = async (req,res,next)=>{
 
 // update produce --admin 
 
-exports.updateProduct = async (req,res,next) => {
+exports.updateProduct = async (req, res, next) => {
     let product = await Product.findById(req.params.id);
 
-    if(!product){
+    if (!product) {
+
+       
+
         return res.status(500).json({
             success:false,
             message:"Product not found"
         })
     }
 
-    product = await Product.findByIdAndUpdate(req.params.id,req.body,{
-        new:true,
-        runValidators:true,
-        useFindAndModify:false
+    product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+        runValidators: true,
+        useFindAndModify: false
     });
 
     res.status(200).json({
-        success:true,
+        success: true,
         product
     })
 }
 
+
+
 // delete product 
 
-
-
-exports.deleteProduct = async (req,res,next) => {
+exports.deleteProduct = async (req, res, next) => {
 
     const product = await Product.findById(req.params.id);
 
-    if(!product){
+    if (!product) {
         return res.status(500).json({
-            success:false,
-            message:"Product not found"
+            success: false,
+            message: "Product not found"
         })
     }
-      
+
     await product.remove();
 
-     res.status(200).json({
-        success:true,
-        message:"Product delete succesfully"
+    res.status(200).json({
+        success: true,
+        message: "Product delete succesfully"
     })
 }
 
